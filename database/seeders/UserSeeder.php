@@ -16,8 +16,8 @@ class UserSeeder extends Seeder
         User::insert([
             [
                 "name" => "admin",
-                "username" => "superadmin12",
-                "password" => "adminpass",
+                "username" => "farhan12",
+                "password" => bcrypt("adminpass"),
             ],
         ]);
     }

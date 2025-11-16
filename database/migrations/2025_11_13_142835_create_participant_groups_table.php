@@ -14,9 +14,13 @@ return new class extends Migration
         Schema::create('participant_groups', function (Blueprint $table) {
             $table->id();
             $table->string("name");
+            $table->string("phone_num");
             $table->foreignId("event_id")->constrained("events");
             $table->integer("total_member");
+            $table->enum("stall_order_type", ["under", "upper"]);
+            $table->enum("status", ["unpaid", "paid", "completed"])->default("unpaid");
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

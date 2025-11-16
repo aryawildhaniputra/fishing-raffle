@@ -17,8 +17,9 @@ class EventSeeder extends Seeder
             [
                 "name" => "Lomba Opening Pemancingan",
                 "event_date" => now(),
+                "price" => 250000,
                 "total_stalls" => 211,
-                "status" => "active",
+                "total_registrant" => 10,
             ],
         ]);
     }

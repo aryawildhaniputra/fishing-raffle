@@ -17,7 +17,9 @@ class ParticipantGroupsSeeder extends Seeder
         ParticipantGroup::insert([
             [
                 "name" => "Gondanglegi",
+                "phone_num" => "082134546789",
                 "event_id" => 1,
+                "status" => "unpaid",
                 "total_member" => 3,
             ],
         ]);

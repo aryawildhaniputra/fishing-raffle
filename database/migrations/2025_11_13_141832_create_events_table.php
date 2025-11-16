@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->integer('price');
             $table->date('event_date');
             $table->integer('total_stalls');
-            $table->enum("status", ["draft", "active", "completed"]);
+            $table->integer('total_registrant');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

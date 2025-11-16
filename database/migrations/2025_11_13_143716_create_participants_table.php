@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId("participant_groups_id")->constrained("participant_groups");
             $table->integer("stall_number");
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
