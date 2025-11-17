@@ -3,7 +3,8 @@
   color: #2d4059;
 }
 .navbar{
-  background-color: #D4AF37;
+background: #7ce68f;
+background: linear-gradient(235deg, rgba(124, 230, 143, 1) 0%, rgba(163, 217, 114, 1) 32%, rgba(253, 187, 45, 1) 80%);
   padding: 12px;
 }
 .navbar span {

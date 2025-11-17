@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Edit Profile')
+@section('title', 'Edit Profil')
 
 @section('custom_css_link', asset('css/Form_style/main.css'))
 
@@ -12,8 +12,8 @@
       <li class="breadcrumb-item align-items-center">
         <a href="{{route('admin.home')}}" class="text-decoration-none">Beranda</a>
       </li>
-      <li class="breadcrumb-item align-items-center">
-        <a href="#" class="text-decoration-none">Edit Profil</a>
+      <li class="breadcrumb-item align-items-center active" aria-current="page">
+        Edit Profil
       </li>
     </ol>
   </nav>

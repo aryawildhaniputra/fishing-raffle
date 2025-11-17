@@ -1,0 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@100;300;400;500;600;700;900&display=swap");
+body {
+  font-family: "Poppins", sans-serif;
+  transition: all 0.5s ease-out;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  background-color: #f5f5f5;
+  min-height: 100dvh;
+  overflow-y: scroll;
+}
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.stat-card .number {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+body .content-wrapper .breadcrumbs-box {
+  border-bottom: 0.5px solid #8d8d8d;
+}
+body .content-wrapper .breadcrumbs-box .page-title {
+  font-size: 20px;
+  letter-spacing: -1px;
+}
+@media (max-width: 991.98px) {
+  body .content-wrapper .breadcrumbs-box .page-title {
+    font-size: 16px;
+    letter-spacing: -1px;
+  }
+}
+body .content-wrapper .main-content .table-wrapper .dataTables_filter {
+  display: none;
+}
+body .content-wrapper .breadcrumbs-box .breadcrumb-item {
+  font-size: 14px;
+  letter-spacing: -0.5px;
+}
+body .content-wrapper .breadcrumbs-box .breadcrumb-item a:hover {
+  text-decoration: underline !important;
+}
+body .content-wrapper .breadcrumbs-box .breadcrumb-item a {
+  color: #2d4059;
+}
+body .content-wrapper .breadcrumbs-box .breadcrumb-item.active {
+  color: #648bbf;
+}
+body .content-wrapper .main-content .dataTables_paginate .pagination {
+  justify-content: end;
+}
+body .content-wrapper .main-content .table-wrapper .row:first-child {
+  display: none;
+}
+body::-webkit-scrollbar {
+    display: none;
+}

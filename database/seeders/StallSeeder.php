@@ -14,7 +14,9 @@ class StallSeeder extends Seeder
     public function run(): void
     {
         Stall::create([
-            "total_stall" => 211
+            "total_stall" => 211,
+            "created_at" => now(),
+            "updated_at" => now(),
         ]);
     }
 }

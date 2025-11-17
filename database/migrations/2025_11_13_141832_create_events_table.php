@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->integer('price');
             $table->date('event_date');
-            $table->integer('total_stalls');
             $table->integer('total_registrant');
             $table->timestamps();
             $table->softDeletes();

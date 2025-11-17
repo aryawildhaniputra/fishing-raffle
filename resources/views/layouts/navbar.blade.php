@@ -1,7 +1,8 @@
 <nav class="navbar bg-body-tertiary position-relative">
   <div class="container-lg">
     <div>
-      <p class="fw-bold mb-0 text-white text-hero">Sistem Undian Pemancingan</p>
+      <p class="fw-bold mb-0 text-white text-hero">🎣 Sistem Undian Pemancingan
+      </p>
     </div>
 
     @if (auth()->user())

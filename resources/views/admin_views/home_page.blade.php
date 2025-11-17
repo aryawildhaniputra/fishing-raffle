@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Home')
+@section('title', 'Beranda')
 
 @section('custom_css_link', asset('css/Home_style/main.css'))
 
@@ -8,8 +8,8 @@
 <div class="breadcrumbs-box mt-1 py-2">
   <nav style="--bs-breadcrumb-divider: '>'" aria-label="breadcrumb">
     <ol class="breadcrumb m-0">
-      <li class="breadcrumb-item">
-        <a href="" class="text-decoration-none">Beranda</a>
+      <li class="breadcrumb-item active" aria-current="page">
+        Beranda
       </li>
     </ol>
   </nav>
@@ -24,23 +24,23 @@
       @foreach ($events as $event)
       <div class="col p-1">
         <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title fw-semibold">{{$event->name}}</h5>
-            <p class="card-text text-secondary fw-medium date-info mb-0">{{$event->event_date_formatted}}</p>
+          <a class="card-body text-decoration-none" href="{{route('admin.detail.event', $event->id)}}">
+            <h5 class="card-title fw-semibold text-white">{{$event->name}}</h5>
+            <p class="card-text text-white fw-light date-info mb-0">{{$event->event_date_formatted}}</p>
             <div class="info-content mt-2 d-flex justify-content-between align-items-end">
               <div class="second-info">
-                <p class="mb-0">Total Lapak : {{$event->total_stalls}}</p>
-                <p class="mb-0">Tersedia : {{$event->total_stalls - $event->total_registrant}}</p>
+                <p class="mb-0 text-white fw-medium">Tersedia : {{App\Support\Constants\Constants::MAX_STALLS -
+                  $event->total_registrant}}</p>
               </div>
               <div class="price-wrapper">
-                <p class="mb-0 fw-bold">{{$event->price_formatted}}</p>
+                <p class="mb-0 fw-semibold text-white">{{$event->price_formatted}}</p>
               </div>
             </div>
-          </div>
+          </a>
           <div class="card-footer bg-white d-flex justify-content-end gap-2">
             <div class="btn-edit" data-name="{{$event->name}}" data-event-date="{{$event->event_date}}"
               data-price="{{$event->price}}" data-edit-link="{{route('admin.update.event', $event->id)}}"
-              data-total-stalls="{{$event->total_stalls}}" data-bs-toggle="modal" data-bs-target="#editModal">
+              data-bs-toggle="modal" data-bs-target="#editModal">
               <i class="ri-edit-line text-warning"></i>
             </div>
             <div class="btn-delete" data-name="{{$event->name}}"
@@ -80,15 +80,10 @@
             <input value="" required class="form-control" type="number" name="price" placeholder="Masukkan harga tiket"
               min="0" />
           </div>
-          <div class="form-group mb-3">
-            <label for="price" class="mb-1">Jumlah Lapak</label>
-            <input value="" required class="form-control" type="number" name="total_stalls"
-              placeholder="Masukkan jumlah lapak" min="0" max="222" />
-          </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button data-cy="btn-submit-store" type="submit" class="btn btn-submit btn-success text-white">Submit</button>
+        <button data-cy="btn-submit-store" type="submit" class="btn btn-submit btn-success text-white">Simpan</button>
       </div>
       </form>
     </div>
@@ -121,16 +116,11 @@
             <input value="" id="price-edit" required class="form-control" type="number" name="price"
               placeholder="Masukkan harga tiket" min="0" />
           </div>
-          <div class="form-group mb-3">
-            <label for="price" class="mb-1">Jumlah Lapak</label>
-            <input value="" id="total-stalls-edit" required class="form-control" type="number" name="total_stalls"
-              placeholder="Masukkan jumlah lapak" min="0" max="222" />
-          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
           <button data-cy="btn-submit-update" type="submit"
-            class="btn btn-warning btn-submit text-black">Submit</button>
+            class="btn btn-warning btn-submit text-black">Perbarui</button>
         </div>
       </form>
     </div>
@@ -168,13 +158,11 @@
           let name = $(this).data('name');
           let eventDate = $(this).data('event-date');
           let price = $(this).data('price');
-          let totalStalls = $(this).data('total-stalls');
           let editLink = $(this).data('edit-link');
 
           $('#name-edit').val(name);
           $('#event-date-edit').val(eventDate);
           $('#price-edit').val(price);
-          $('#total-stalls-edit').val(totalStalls);
 
           // Set form action with Jquery
           $('#editForm').attr('action', editLink);
@@ -190,6 +178,6 @@
   $('.event-name').html(name);
 
   $('#deleteForm').attr('action', deleteLink);
-});
+  });
 </script>
 @endpush

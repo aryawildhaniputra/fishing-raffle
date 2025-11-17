@@ -14,7 +14,6 @@ class Event extends Model
         'name',
         'event_date',
         'price',
-        'total_stalls',
         'total_registrant',
     ];
 
@@ -38,5 +37,10 @@ class Event extends Model
     public function groups(): HasMany
     {
         return $this->hasMany(ParticipantGroup::class, "event_id", "id");
+    }
+
+    public function participants()
+    {
+        return $this->hasManyThrough(Participant::class, ParticipantGroup::class, 'event_id', 'participant_groups_id', 'id', 'id');
     }
 }

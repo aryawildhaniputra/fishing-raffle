@@ -21,6 +21,9 @@ class ParticipantGroupsSeeder extends Seeder
                 "event_id" => 1,
                 "status" => "unpaid",
                 "total_member" => 3,
+                "raffle_status" => "not_yet",
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
         ]);
     }

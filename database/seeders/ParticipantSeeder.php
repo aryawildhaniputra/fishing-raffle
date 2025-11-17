@@ -18,16 +18,22 @@ class ParticipantSeeder extends Seeder
                 "name" => "Gondanglegi_1",
                 "participant_groups_id" => 1,
                 "stall_number" => 3,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
-                "name" => "Gondanglegi_1",
+                "name" => "Gondanglegi_2",
                 "participant_groups_id" => 1,
                 "stall_number" => 4,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
             [
-                "name" => "Gondanglegi_1",
+                "name" => "Gondanglegi_3",
                 "participant_groups_id" => 1,
                 "stall_number" => 5,
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
         ]);
     }

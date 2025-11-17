@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex">
   <meta name="googlebot" content="noindex">
 
-  <title>Sirepo-JTI | @yield('title')</title>
+  <title>Undian Pemancingan | @yield('title')</title>
   <!-- Icon -->
   <link rel="icon" type="image/x-icon" href="{{asset('img/jti_logo.png')}}" />
 
@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="@yield('custom_css_link')" />
   <link rel="stylesheet" href="{{asset('css/Navbar_style/main.css')}}" />
   <link rel="stylesheet" href="{{asset('css/Preloader/main.css')}}" />
+
+  @stack('custom_css')
 
   @yield('custom-header')
 
@@ -47,11 +49,6 @@
     @include('sweetalert::alert')
 
   </div>
-
-  <!-- Footer -->
-  {{-- <div class="container-lg content-down footer-wrapper pt-3 pb-2 mt-3">
-    @include('layouts.footer')
-  </div> --}}
 
 </body>
 {{-- jquery --}}

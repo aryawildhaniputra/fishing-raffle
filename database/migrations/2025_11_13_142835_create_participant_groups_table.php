@@ -17,8 +17,10 @@ return new class extends Migration
             $table->string("phone_num");
             $table->foreignId("event_id")->constrained("events");
             $table->integer("total_member");
-            $table->enum("stall_order_type", ["under", "upper"]);
-            $table->enum("status", ["unpaid", "paid", "completed"])->default("unpaid");
+            $table->enum("stall_order_type", ["under", "upper"])->nullable();
+            $table->enum("status", ["unpaid", "dp", "paid"])->default("unpaid");
+            $table->enum("raffle_status", ["not_yet", "completed"])->default("not_yet");
+            $table->text("information")->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

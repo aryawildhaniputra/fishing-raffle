@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Support\Constants\Constants;
 use Error;
 use Exception;
 use Illuminate\Http\Request;
@@ -29,13 +30,11 @@ class HomeController extends Controller
                 'name' => 'required|string',
                 'event_date' => 'required|date',
                 'price' => 'required|numeric|min:0',
-                'total_stalls' => 'required|numeric|min:0|max:222',
             ],
             [
                 'name.required' => "Nama Event Wajib Diisi",
                 'event_date.required' => "Tanggal Event Wajib Diisi",
                 'price.required' => "Harga Tiket Event Wajib Diisi",
-                'total_stalls.required' => "Jumlah Lapak Event Wajib Diisi",
             ]
         );
 
@@ -62,7 +61,6 @@ class HomeController extends Controller
             'name' => 'string',
             'event_date' => 'date',
             'price' => 'numeric|min:0',
-            'total_stalls' => 'numeric|min:0|max:222',
         ]);
 
         if ($validator->fails()) {
@@ -79,13 +77,6 @@ class HomeController extends Controller
                 throw new Error("Data Tidak Ditemukan");
             }
 
-            if ($event->total_stalls != $data['total_stalls']) {
-                $newTotalRegistrant = $data['total_stalls'] - $event->total_registrant;
-
-                if ($newTotalRegistrant < 0) {
-                    throw new Error("Data Pendaftar Lebih Banyak daripada Data Lapak Baru");
-                }
-            }
             $event->update($data);
             return redirect()->back()->with('success', 'Data Event Berhasil Ditambahkan');
         } catch (\Throwable $th) {

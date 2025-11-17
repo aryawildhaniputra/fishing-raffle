@@ -18,6 +18,8 @@ class UserSeeder extends Seeder
                 "name" => "admin",
                 "username" => "farhan12",
                 "password" => bcrypt("adminpass"),
+                "created_at" => now(),
+                "updated_at" => now(),
             ],
         ]);
     }
