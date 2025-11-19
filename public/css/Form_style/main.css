@@ -33,15 +33,17 @@ body .content-wrapper .breadcrumbs-box .page-title {
 body .content-wrapper .breadcrumbs-box .breadcrumb-item {
   font-size: 14px;
   letter-spacing: -0.5px;
+  color: #111;
 }
 body .content-wrapper .breadcrumbs-box .breadcrumb-item a:hover {
   text-decoration: underline !important;
+  color: #000;
 }
 body .content-wrapper .breadcrumbs-box .breadcrumb-item a {
-  color: #2d4059;
+  color: #111;
 }
 body .content-wrapper .breadcrumbs-box .breadcrumb-item.active {
-  color: #648bbf;
+  color: #000;
 }
 body .content-wrapper .drop-area {
   padding: 12px;

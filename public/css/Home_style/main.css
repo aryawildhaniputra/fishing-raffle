@@ -19,15 +19,17 @@ body .content-wrapper {
 }
 body .content-wrapper .breadcrumb-item {
   font-size: 14px;
+  color: #111;
 }
 body .content-wrapper .breadcrumb-item a {
-  color: #2d4059;
+  color: #111;
 }
 body .content-wrapper .breadcrumb-item a:hover {
   text-decoration: underline !important;
+  color: #000;
 }
 body .content-wrapper .breadcrumb-item.active {
-  color: #648bbf;
+  color: #000;
 }
 body .content-wrapper .breadcrumbs-box {
   border-bottom: 0.5px solid #8d8d8d;
@@ -285,6 +287,72 @@ body::-webkit-scrollbar {
     display: none;
 }
 
-.card{
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+.event-card{
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 25px rgba(3, 26, 11, 0.4);
+}
+
+.event-card--forest{
+  background: linear-gradient(180deg, #05240c 0%, #0f6b24 65%, #0a3814 100%);
+}
+
+.event-card--spruce{
+  background: linear-gradient(180deg, #032010 0%, #0e5d2a 60%, #07421b 100%);
+}
+
+.event-card--mint{
+  background: linear-gradient(180deg, #05311c 0%, #10894a 60%, #075530 100%);
+}
+
+.event-card--teal{
+  background: linear-gradient(180deg, #042d28 0%, #0ca08f 60%, #056059 100%);
+}
+
+.event-card--moss{
+  background: linear-gradient(180deg, #032a13 0%, #3f8f1f 60%, #1d4f0f 100%);
+}
+
+.event-card::before,
+.event-card::after{
+  content: "";
+  position: absolute;
+  background: rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+
+.event-card::before{
+  width: 180px;
+  height: 180px;
+  top: -60px;
+  right: -60px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  filter: drop-shadow(0 0 15px rgba(255,255,255,0.15));
+}
+
+.event-card::after{
+  width: 120px;
+  height: 120px;
+  bottom: -40px;
+  left: -30px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  opacity: 0.6;
+}
+
+.event-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 15px 30px rgba(4, 31, 12, 0.5);
+}
+
+.event-card .card-body,
+.event-card .card-footer{
+  position: relative;
+  z-index: 1;
+}
+
+.event-card .card-footer{
+  background: rgba(0,0,0,0.15);
+  border-top: 1px solid rgba(255,255,255,0.15);
 }

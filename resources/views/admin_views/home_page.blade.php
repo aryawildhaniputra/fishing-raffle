@@ -21,15 +21,18 @@
   </div>
   <div class="body mt-2">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3">
+      @php
+        $cardVariants = ['event-card--forest', 'event-card--spruce', 'event-card--mint', 'event-card--teal', 'event-card--moss'];
+      @endphp
       @foreach ($events as $event)
       <div class="col p-1">
-        <div class="card h-100">
+        <div class="card event-card {{$cardVariants[$loop->index % count($cardVariants)]}} h-100">
           <a class="card-body text-decoration-none" href="{{route('admin.detail.event', $event->id)}}">
             <h5 class="card-title fw-semibold text-white">{{$event->name}}</h5>
             <p class="card-text text-white fw-light date-info mb-0">{{$event->event_date_formatted}}</p>
             <div class="info-content mt-2 d-flex justify-content-between align-items-end">
               <div class="second-info">
-                <p class="mb-0 text-white fw-medium">Tersedia : {{App\Support\Constants\Constants::MAX_STALLS -
+                <p class="mb-0 text-white fw-medium">Lapak Tersedia : {{App\Support\Constants\Constants::MAX_STALLS -
                   $event->total_registrant}}</p>
               </div>
               <div class="price-wrapper">

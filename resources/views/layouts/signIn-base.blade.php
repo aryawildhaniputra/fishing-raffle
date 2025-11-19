@@ -37,9 +37,10 @@
         "></div>
     <div class="col-lg-5 col-12 h-100 content-right">
       <div class="row justify-content-center align-items-center h-100">
-        <div class="border-2 signin-box p-3 p-sm-4 rounded rounded-5 col-8 col-md-6">
+        <div class="border-2 signin-box p-3 p-sm-4 rounded rounded-5 col-10 col-md-7 col-lg-8">
           <div class="header">
             <div class="text-center">
+              <img src="{{asset('img/logos.png')}}" alt="Logo KP Bintang Jaya Malang" class="signin-logo mb-3" />
               <h1 class="my-0 mt-4 fs-4 fw-normal" data-cy="title">@yield('title')</h1>
             </div>
           </div>
@@ -69,7 +70,7 @@
             </div>
           </form>
           <div class="auth-footer text-center text-secondary mt-1">
-            <span class="copyright">Copyright ©{{date('Y')}}, Pemancingan</span>
+            <span class="copyright">Copyright ©{{date('Y')}}, KP Bintang Jaya Malang</span>
           </div>
         </div>
       </div>
@@ -86,10 +87,10 @@
   $('.loading-wrapper').addClass('d-none');
   });
 
-  $('.pass-icon').click(function (e) { 
+  $('.pass-icon').click(function (e) {
     e.preventDefault();
     $('.pass-icon').toggleClass('ri-eye-fill');
-    $('#password').prop("type") == 'password' ?  $('#password').attr('type', 'text') :  $('#password').attr('type', 'password'); 
+    $('#password').prop("type") == 'password' ?  $('#password').attr('type', 'text') :  $('#password').attr('type', 'password');
   });
 
 </script>

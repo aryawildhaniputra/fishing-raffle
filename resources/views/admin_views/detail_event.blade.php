@@ -22,21 +22,21 @@
 
 @section('main-content')
 <div class="main-content mt-3">
-  <div class="stats">
-    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="stats">
+      <div class="stat-card stat-card--forest">
       <h3>Total Lapak</h3>
       <div class="number">{{App\Support\Constants\Constants::MAX_STALLS}}</div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+      <div class="stat-card stat-card--spruce">
       <h3>Lapak Tersedia</h3>
       <div class="number">{{App\Support\Constants\Constants::MAX_STALLS - $event->total_registrant}}
       </div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+      <div class="stat-card stat-card--mint">
       <h3>Total Grup</h3>
       <div class="number">{{$event->groups_count}}</div>
     </div>
-    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+      <div class="stat-card stat-card--teal">
       <h3>Total Pendaftar</h3>
       <div class="number">{{$event->total_registrant}}</div>
     </div>
@@ -64,12 +64,24 @@
           aria-labelledby="home-tab" tabindex="0">
           <div class="action-wrapper d-lg-flex mt-3 justify-content-between align-items-baseline">
             <div class="wrapper d-flex justify-content-end">
-              <a href="#" class="btn btn-success">
-                <div data-cy="btn-link-add-type" class="wrapper d-flex gap-2 align-items-center" id="add"
-                  data-bs-toggle="modal" data-bs-target="#addNewModal">
-                  <span class="fw-medium">Tambah Pendaftar</span>
+              <div class="d-flex flex-wrap gap-2">
+                <a href="#" class="btn btn-success">
+                  <div data-cy="btn-link-add-type" class="wrapper d-flex gap-2 align-items-center" id="add"
+                    data-bs-toggle="modal" data-bs-target="#addNewModal">
+                    <span class="fw-medium">Tambah Pendaftar</span>
+                  </div>
+                </a>
+                <div class="dropdown">
+                  <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Export
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+                    <li><button class="dropdown-item" id="export-pdf" type="button">PDF</button></li>
+                    <li><button class="dropdown-item" id="export-excel" type="button">Excel</button></li>
+                  </ul>
                 </div>
-              </a>
+              </div>
             </div>
             <div class="wrapper mt-2 mt-lg-0">
               <div class="input-group">
@@ -88,10 +100,10 @@
                   <th>No Telepon</th>
                   <th>Anggota</th>
                   <th>Status</th>
-                  <th>Status Pengundian</th>
+                  <th>Pengundian</th>
                   <th>Tanggal</th>
-                  <th>Aksi</th>
                   <th>Informasi</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,6 +142,7 @@
                     @endswitch
                   </td>
                   <td>{{$group->created_at_formatted}}</td>
+                  <td>{{$group->information}}</td>
                   <td>
                     <div class="d-flex gap-1">
                       <div data-bs-toggle="modal" data-bs-target="#editModal"
@@ -143,7 +156,6 @@
                       </div>
                     </div>
                   </td>
-                  <td>{{$group->information}}</td>
                 </tr>
                 @endforeach
               </tbody>
@@ -218,7 +230,7 @@
           </div>
           <div class="form-group mb-3">
             <label for="information" class="mb-1">Informasi (Opsional)</label>
-            <input value="" required class="form-control" type="text" name="information"
+            <input value="" class="form-control" type="text" name="information"
               placeholder="Masukkan informasi tambahan" />
           </div>
       </div>
@@ -280,7 +292,7 @@
             </div>
             <div class="form-group mb-3">
               <label for="information" class="mb-1">Informasi (Opsional)</label>
-              <input value="" required class="form-control" type="text" name="information"
+              <input value="" class="form-control" type="text" name="information" id="information_edit"
                 placeholder="Masukkan informasi tambahan" />
             </div>
           </div>
@@ -337,34 +349,65 @@
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
 <script>
-  $('.search-input').keyup(function() {
-          let table = $('#participant-group-table').DataTable();
-          table.search($(this).val()).draw();
+  $(document).ready(function() {
+      const exportFileName = 'peserta-{{$event->name}}-{{\Illuminate\Support\Str::lower(\Carbon\Carbon::parse($event->event_date)->locale("id")->translatedFormat("j F Y"))}}';
+
+      const table = $('#participant-group-table').DataTable({
+        order: [[0, 'desc']],
+        dom: 'Bfrtip',
+        buttons: [
+          {
+            extend: 'pdf',
+            className: 'buttons-pdf-export',
+            filename: exportFileName,
+            title: exportFileName,
+            exportOptions: {
+              columns: [0, 1, 2, 3, 4, 6, 7]
+            }
+          },
+          {
+            extend: 'excel',
+            className: 'buttons-excel-export',
+            filename: exportFileName,
+            title: exportFileName,
+            exportOptions: {
+              columns: [0, 1, 2, 3, 4, 6, 7]
+            }
+          }
+        ]
       });
 
-      $('#participant-group-table').DataTable( {
-      order: [[0, 'desc']],
-      dom: 'Bfrtip',
-      buttons: [ 'pdf', 'excel',]
-      }); 
-      
+      table.buttons().container().addClass('d-none');
+
+      $('.search-input').on('keyup', function() {
+        table.search($(this).val()).draw();
+      });
+
+      $('#export-pdf').on('click', function() {
+        table.button('.buttons-pdf-export').trigger();
+      });
+
+      $('#export-excel').on('click', function() {
+        table.button('.buttons-excel-export').trigger();
+      });
+
       $(document).on("click", ".btn-edit", function () {
           $(".not-found-state").addClass('d-none');
           $("#content-wrapper").addClass("d-none");
-          $("#spinner").removeClass('d-none'); 
+          $("#spinner").removeClass('d-none');
 
           let participantGroupID = $(this).data("participant-group-id"); // <-- GET ID FROM BUTTON
 
           let url = "{{ route('admin.get.ParticipantGroupByID', ['id' => ':id']) }}";
           url = url.replace(':id', participantGroupID);
-          
+
           $.ajax({
             url: url,
             type: "GET",
-            
+
             success: function(response) {
                   let urlEditForm = "{{ route('admin.update.participant.group', ['id' => ':id']) }}";
-                  urlEditForm = url.replace(':id', participantGroupID);
+                  urlEditForm = urlEditForm.replace(':id', participantGroupID);
                   $('#editForm').attr('action', urlEditForm);
 
                   // fill form
@@ -373,7 +416,7 @@
                   $("#phone_num_edit").val(response.data.phone_num);
                   $("#total_member_edit").val(response.data.total_member);
                   $("#status_edit").val(response.data.status);
-                  $("#registration_date_edit").val(response.data.registration_date);
+                  $("#registration_date_edit").val(response.data.registration_date); //ditambahi time pisan bran
                   $("#information_edit").val(response.data.information);
 
                   // show form
@@ -385,20 +428,21 @@
               },
 
               complete: function() {
-                  $("#spinner").addClass('d-none'); 
+                  $("#spinner").addClass('d-none');
               }
           });
 
       });
 
-  $(document).on('click', '.btn-delete', function(event){
-  let name = $(this).data('registrant-name');
-  let deleteLink = $(this).data('delete-link');
+      $(document).on('click', '.btn-delete', function(event){
+        let name = $(this).data('registrant-name');
+        let deleteLink = $(this).data('delete-link');
 
-  $('#deleteModal').modal('show');
-  $('.registrant-name').html(name);
+        $('#deleteModal').modal('show');
+        $('.registrant-name').html(name);
 
-  $('#deleteForm').attr('action', deleteLink);
+        $('#deleteForm').attr('action', deleteLink);
+      });
   });
 </script>
 @endpush

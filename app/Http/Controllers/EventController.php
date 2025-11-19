@@ -145,16 +145,39 @@ class EventController extends Controller
         try {
             $participantGroup = ParticipantGroup::find($ID);
 
-            if (!isset($event)) {
+            if (!isset($participantGroup)) {
                 throw new Error("Data Tidak Ditemukan");
             }
 
+            $event = Event::find($participantGroup->event_id);
+
+            if (!isset($event)) {
+                throw new Error("Data Event Tidak Ditemukan");
+            }
+
+            DB::beginTransaction();
+
+            $newTotalRegister = max(
+                0,
+                $event->total_registrant - $participantGroup->total_member
+            );
+
+            $event->update([
+                'total_registrant' => $newTotalRegister
+            ]);
+
             $participantGroup->delete();
+
+            DB::commit();
 
             return redirect()->back()->with('success', 'Data Pendaftar Telah Dihapus');
         } catch (\Throwable $th) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
             return back()
                 ->with('errors', 'Gagal Menghapus Data Pendaftar');
         }
     }
 }
+
