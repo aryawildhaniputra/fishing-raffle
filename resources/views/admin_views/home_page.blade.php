@@ -16,16 +16,43 @@
 </div>
 
 <div class="py-2">
-  <div class="head d-flex justify-content-end">
-    <div class="btn btn-success" id="add" data-bs-toggle="modal" data-bs-target="#addNewModal">Buat Event Baru</div>
+  <div class="head d-flex justify-content-between align-items-center gap-3">
+    <!-- Date Filter & Search Bar (Kiri) -->
+    <div class="d-flex gap-2 align-items-center">
+      <!-- Date Filter -->
+      <div class="date-filter-wrapper">
+        <div class="input-group">
+          <span class="input-group-text bg-white">
+            <i class="ri-calendar-line"></i>
+          </span>
+          <input type="date" class="form-control py-2 px-3 border-start-0" id="dateFilter" name="date_filter" />
+        </div>
+      </div>
+      
+      <!-- Search Bar -->
+      <div class="search-wrapper">
+        <div class="input-group">
+          <span class="input-group-text bg-white">
+            <i class="ri-search-line"></i>
+          </span>
+          <input type="text" class="form-control py-2 px-3 border-start-0" id="searchEvent" placeholder="Telusuri" name="search" />
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tombol Buat Event Baru (Kanan) -->
+    <div class="btn btn-success flex-shrink-0" id="add" data-bs-toggle="modal" data-bs-target="#addNewModal">Buat Event Baru</div>
   </div>
-  <div class="body mt-2">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3">
+  <div class="body mt-2" id="eventsBodyContainer">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3" id="eventCardsContainer">
       @php
         $cardVariants = ['event-card--forest', 'event-card--spruce', 'event-card--mint', 'event-card--teal', 'event-card--moss'];
       @endphp
       @foreach ($events as $event)
-      <div class="col p-1">
+      <div class="col p-1 event-card-wrapper" 
+           data-event-name="{{strtolower($event->name)}}" 
+           data-event-date="{{$event->event_date_formatted}}" 
+           data-event-price="{{$event->price_formatted}}">
         <div class="card event-card {{$cardVariants[$loop->index % count($cardVariants)]}} h-100">
           <a class="card-body text-decoration-none" href="{{route('admin.detail.event', $event->id)}}">
             <h5 class="card-title fw-semibold text-white">{{$event->name}}</h5>
@@ -157,6 +184,71 @@
 
 @push('js')
 <script>
+  // Combined Search and Date Filter Function
+  function filterEvents() {
+    let searchQuery = $('#searchEvent').val().toLowerCase().trim();
+    let selectedDate = $('#dateFilter').val();
+    let visibleCount = 0;
+    
+    $('.event-card-wrapper').each(function() {
+      let eventName = $(this).data('event-name');
+      let eventDate = $(this).data('event-date').toLowerCase();
+      let eventPrice = $(this).data('event-price').toLowerCase();
+      
+      // Check search query match
+      let matchesSearch = searchQuery === '' || 
+                         eventName.includes(searchQuery) || 
+                         eventDate.includes(searchQuery) || 
+                         eventPrice.includes(searchQuery);
+      
+      // Check date filter match
+      let matchesDate = true;
+      if (selectedDate !== '') {
+        // Convert selected date to readable format for comparison
+        let dateObj = new Date(selectedDate);
+        let options = { day: 'numeric', month: 'long', year: 'numeric' };
+        let formattedDate = dateObj.toLocaleDateString('id-ID', options).toLowerCase();
+        matchesDate = eventDate.includes(formattedDate);
+      }
+      
+      // Show/hide based on both filters
+      if (matchesSearch && matchesDate) {
+        $(this).show();
+        visibleCount++;
+      } else {
+        $(this).hide();
+      }
+    });
+    
+    // Show/hide "no results" message
+    if (visibleCount === 0 && (searchQuery !== '' || selectedDate !== '')) {
+      if ($('#noResultsMessage').length === 0) {
+        let filterText = searchQuery !== '' ? 'pencarian "<strong>' + searchQuery + '</strong>"' : '';
+        if (selectedDate !== '' && searchQuery !== '') {
+          filterText += ' dan ';
+        }
+        if (selectedDate !== '') {
+          filterText += 'tanggal yang dipilih';
+        }
+        
+        $('#eventsBodyContainer').append(
+          '<div id="noResultsMessage" class="text-center py-5" style="min-height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;">' +
+            '<i class="ri-search-line" style="font-size: 64px; color: #999;"></i>' +
+            '<p class="mt-3 text-muted fs-5">Tidak ada event yang sesuai dengan ' + filterText + '</p>' +
+          '</div>'
+        );
+      }
+    } else {
+      $('#noResultsMessage').remove();
+    }
+  }
+
+  // Search Event Functionality
+  $('#searchEvent').on('keyup', debounce(filterEvents, 300));
+  
+  // Date Filter Functionality
+  $('#dateFilter').on('change', filterEvents);
+
   $(document).on('click', '.btn-edit', function (event){
           let name = $(this).data('name');
           let eventDate = $(this).data('event-date');
