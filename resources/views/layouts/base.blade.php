@@ -92,9 +92,23 @@
      };
 };
 
+
 $(document).ready(function () {
   $('.loading-wrapper').addClass('d-none');
+  
+  // Restore scroll position setelah page reload (jika ada alert)
+  @if(session('success') || session('errors'))
+  if (sessionStorage.getItem('scrollPosition')) {
+    window.scrollTo(0, parseInt(sessionStorage.getItem('scrollPosition')));
+    sessionStorage.removeItem('scrollPosition');
+  }
+  @endif
+  
+  // Simpan scroll position sebelum form submit
+  $('form').on('submit', function() {
+    sessionStorage.setItem('scrollPosition', window.scrollY);
   });
+});
 </script>
 
 
