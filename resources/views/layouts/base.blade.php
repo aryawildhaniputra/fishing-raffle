@@ -26,6 +26,17 @@
 
   @yield('custom-header')
 
+  <style>
+    /* Fix SweetAlert: Mencegah layar bergeser saat alert muncul */
+    html {
+      overflow-y: scroll;
+    }
+    
+    body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+      padding-right: 0 !important;
+    }
+  </style>
+
 </head>
 
 <body class="d-flex flex-column justify-content-between">
