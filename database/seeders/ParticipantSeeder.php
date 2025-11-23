@@ -16,6 +16,7 @@ class ParticipantSeeder extends Seeder
         Participant::insert([
             [
                 "name" => "Gondanglegi_1",
+                "event_id" => 1,
                 "participant_groups_id" => 1,
                 "stall_number" => 3,
                 "created_at" => now(),
@@ -23,6 +24,7 @@ class ParticipantSeeder extends Seeder
             ],
             [
                 "name" => "Gondanglegi_2",
+                "event_id" => 1,
                 "participant_groups_id" => 1,
                 "stall_number" => 4,
                 "created_at" => now(),
@@ -30,11 +32,12 @@ class ParticipantSeeder extends Seeder
             ],
             [
                 "name" => "Gondanglegi_3",
+                "event_id" => 1,
                 "participant_groups_id" => 1,
                 "stall_number" => 5,
                 "created_at" => now(),
                 "updated_at" => now(),
-            ],
+            ]
         ]);
     }
 }

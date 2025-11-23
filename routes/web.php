@@ -32,6 +32,9 @@ Route::group(['middleware' => ['auth']], function () {
             Route::put('/{id}', [EventController::class, 'updateParticipantGroup'])->name('admin.update.participant.group');
             Route::get('/{id}', [EventController::class, 'getParticipantGroupByID'])->name('admin.get.ParticipantGroupByID');
             Route::delete('/{id}', [EventController::class, 'destroyParticipantGroupByID'])->name('admin.destroy.ParticipantGroup');
+
+            Route::get('/{id}/drawStall', [EventController::class, 'drawStall'])->name('admin.get.drawStall');
+            Route::post('/confirm-draw', [EventController::class, 'confirmDraw'])->name('admin.confirm.draw');
         });
     });
 });

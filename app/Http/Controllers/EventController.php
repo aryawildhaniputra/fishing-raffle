@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Participant;
 use App\Models\ParticipantGroup;
 use App\Support\Constants\Constants;
+use App\Support\Enums\ConfirmDrawTypeEnum;
+use App\Support\Enums\ParticipantGroupRaffleStatusEnum;
 use App\Support\Enums\ParticipantGroupStatusEnum;
 use Error;
 use Illuminate\Http\Request;
@@ -18,7 +21,20 @@ class EventController extends Controller
     {
         $event = Event::with('groups')->withCount(['groups'])->find($ID);
 
-        return view('admin_views.detail_event', ['event' => $event]);
+        $groupCollect = collect($event->groups->toArray());
+        $groups_not_yet_drawn = $groupCollect
+            ->whereIn("status", ["dp", "paid"])
+            ->where("raffle_status", "not_yet")
+            ->sortBy([
+                ['total_member', 'asc'],
+                ['status', 'desc'],
+                ['created_at', 'desc'],
+            ])
+            ->values();
+
+        $groups_drawn = $groupCollect->where("raffle_status", "completed")->sortBy(["created_at", "asc"])->values();
+
+        return view('admin_views.detail_event', ['event' => $event, 'groups_not_yet_drawn' => $groups_not_yet_drawn, 'groups_drawn' => $groups_drawn]);
     }
 
     public function storeParticipantGroup(Request $request)
@@ -45,6 +61,10 @@ class EventController extends Controller
             if (!isset($event)) {
                 throw new Error("Data Tidak Ditemukan");
             }
+
+            $existedParticipant = ParticipantGroup::where('event_id', $event->id)->where('name', $data['name'])->first();
+
+            if ($existedParticipant) throw new Error("Nama Grup Telah Digunakan");
 
             $totalRegister = $event->total_registrant + $data['total_member'];
 
@@ -145,7 +165,7 @@ class EventController extends Controller
         try {
             $participantGroup = ParticipantGroup::find($ID);
 
-            if (!isset($event)) {
+            if (!isset($participantGroup)) {
                 throw new Error("Data Tidak Ditemukan");
             }
 
@@ -155,6 +175,125 @@ class EventController extends Controller
         } catch (\Throwable $th) {
             return back()
                 ->with('errors', 'Gagal Menghapus Data Pendaftar');
+        }
+    }
+
+    public function drawStall(string $ID)
+    {
+        try {
+            $participantGroup = ParticipantGroup::find($ID);
+
+            if (!$participantGroup) throw new Error("Data Grup Tidak Ditemukan");
+
+            if ($participantGroup->status === ParticipantGroupRaffleStatusEnum::COMPLETED->value) throw new Error("Grup Telah Diundi");
+
+            $bookedStalls = Participant::where('event_id', $participantGroup->event_id)->get()->pluck('stall_number');
+
+            $numbers = collect(range(1, 222));
+
+            $availableStallNumber = $numbers->whereNotIn(null, $bookedStalls->toArray())->values();
+
+            $rawRange = $participantGroup->total_member > 1 ? $availableStallNumber->chunk(($participantGroup->total_member * 2) - 1) : $availableStallNumber;
+
+            $randomStallNumber = $participantGroup->total_member > 1 ? $rawRange->random()->values() : $rawRange->random();
+
+            $under = $participantGroup->total_member > 1 ? $randomStallNumber->slice(0, ceil($randomStallNumber->count() / 2))->values() : null;
+            $upper = $participantGroup->total_member > 1 ? $randomStallNumber->slice(ceil($randomStallNumber->count() / 2) - 1)->values() : null;
+            $middle = $participantGroup->total_member > 1 ? $under->last() : $randomStallNumber;
+
+            return response()->json([
+                'data' => [
+                    'participant_group_id' => $participantGroup->id,
+                    'total_member' => $participantGroup->total_member,
+                    'randomStallNumber' => $randomStallNumber,
+                    'upper' => $upper,
+                    'under' => $under,
+                    'middle' => $middle
+                ],
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'Error'
+            ], 404);
+        }
+    }
+
+    public function confirmDraw(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'participantGroupID' => 'required|string',
+                'randomStallNumberType' => 'nullable|string',
+                'randomStallNumber' => 'required|string',
+                'randomStallNumberUpper' => 'nullable|string',
+                'randomStallNumberUnder' => 'nullable|string',
+            ]);
+
+            if ($validator->fails()) throw new Error(join(', ', $validator->messages()->all()));
+
+            $randomStallNumber = explode(',', $request->randomStallNumber);
+
+            if (count($randomStallNumber) > 1) {
+                $validator = Validator::make($request->all(), [
+                    'randomStallNumberType' => 'required|string|in:' . ConfirmDrawTypeEnum::UPPER->value . ',' . ConfirmDrawTypeEnum::UNDER->value,
+                    'randomStallNumberUpper' => 'required|string',
+                    'randomStallNumberUnder' => 'required|string',
+                ]);
+
+                if ($validator->fails()) throw new Error(join(', ', $validator->messages()->all()));
+            }
+
+            $participantGroup = ParticipantGroup::find($request->participantGroupID);
+
+            if (!$participantGroup) throw new Error("Data Grup Tidak Ditemukan");
+
+            if ($participantGroup->status === ParticipantGroupRaffleStatusEnum::COMPLETED->value) throw new Error("Grup Telah Diundi");
+
+            DB::beginTransaction();
+
+            $typeDrawConfirm = $request->randomStallNumberType;
+            $randomStallNumberConfirmation = null;
+
+            if (count($randomStallNumber) > 1) {
+                if ($typeDrawConfirm == ConfirmDrawTypeEnum::UPPER->value) {
+                    $randomStallNumberConfirmation = json_decode($request->randomStallNumberUpper, true);
+                } else if ($typeDrawConfirm == ConfirmDrawTypeEnum::UNDER->value) {
+                    $randomStallNumberConfirmation = json_decode($request->randomStallNumberUnder, true);
+                } else {
+                    if (!$participantGroup) throw new Error("Type Draw Confirm Invalid");
+                }
+            } else {
+                $randomStallNumberConfirmation = $randomStallNumber;
+            }
+
+
+            for ($i = 0; $i < count($randomStallNumberConfirmation); $i++) {
+                $isStallBooked = Participant::where('event_id', $participantGroup->event_id)
+                    ->where('stall_number', $randomStallNumberConfirmation[$i])
+                    ->get();
+
+                if ($isStallBooked->count() > 0) throw new Error("Lapak " . $randomStallNumberConfirmation[$i] . " Telah Dibooking");
+
+                Participant::create([
+                    'name' => $participantGroup->name . "-" . ($i + 1),
+                    'participant_groups_id' => $participantGroup->id,
+                    'event_id' => $participantGroup->event_id,
+                    'stall_number' => $randomStallNumberConfirmation[$i],
+                ]);
+            }
+
+            $participantGroup->update([
+                "raffle_status" => ParticipantGroupRaffleStatusEnum::COMPLETED->value
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Data Undian Berhasil Disimpan');
+        } catch (\Throwable $th) {
+            DB::rollback();
+
+            return back()
+                ->with('errors', $th->getMessage());
         }
     }
 }
