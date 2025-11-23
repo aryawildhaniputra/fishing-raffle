@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pemancingan | @yield('title')</title>
   <!-- Icon -->
-  <link rel="icon" type="image/x-icon" href="{{asset('img/jti_logo.png')}}" />
+  <link rel="icon" type="image/x-icon" href="{{asset('img/global-fill.png')}}" />
 
   <!-- CSS Bootsrap-->
   <link rel="stylesheet" href="{{asset('vendor/bootstrap-5.2/css/bootstrap.min.css')}}" />

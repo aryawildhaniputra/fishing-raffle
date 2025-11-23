@@ -57,8 +57,8 @@ class EventController extends Controller
             'groups_not_yet_drawn' => $groups_not_yet_drawn,
             'groups_drawn' => $groups_drawn,
             'participants' => $allParticipantsData,
-            'leftColumnParticipant' => $splitParticipantsData->first(),
-            'rightColumnParticipant' => $splitParticipantsData->last(),
+            'rightColumnParticipant' => $splitParticipantsData->first()->sortByDesc('stall_number'),
+            'leftColumnParticipant' => $splitParticipantsData->last(),
         ]);
     }
 
