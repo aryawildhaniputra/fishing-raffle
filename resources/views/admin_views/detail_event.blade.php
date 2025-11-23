@@ -57,6 +57,13 @@
           🎲 Pengundian
         </button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="text-black nav-link" id="profile-tab" data-bs-toggle="tab" data-cy="tab-pdf"
+          data-bs-target=" #layout-tab-pane" type="button" role="tab" aria-controls="raffle-tab-pane"
+          aria-selected="false">
+          🎣 Layout Lapak
+        </button>
+      </li>
     </ul>
     <div class="tab-content" id="myTabContent">
       <div class="tab-pane overview-wrapper fade show active bg-white p-2" id="manage-registrant-tab-pane"
@@ -324,42 +331,154 @@
           </table>
         </div>
       </div>
+      <div class="tab-pane fade document-link-wrapper bg-white p-2" data-cy="wrapper-document-link" id="layout-tab-pane"
+        role="tabpanel" aria-labelledby="raffle-tab-pane" tabindex="0">
+        <div class="layout-wrapper d-lg-flex">
+          <div class="layout-wrap d-flex col-12 col-lg-8 h-100">
+            <div class="left-column col-1 d-flex gap-1">
+              <div class="stall-line col-1 border-bottom bg-secondary"></div>
+              <div class="box-wrapper col-10 d-flex flex-column gap-1">
+                @foreach ($leftColumnParticipant as $data)
+                <div @class( [ 'ratio ratio-1x1 border border-2 rounded d-flex justify-content-center
+                  align-items-center fw-bold text-white' , 'bg-danger'=> $data['isBooked'],
+                  'bg-success'=> !$data['isBooked']
+                  ])
+                  >
+                  {{$data['stall_number']}}
+                </div>
+                @endforeach
+              </div>
+            </div>
+            <div class="middle-column col-10 px-2">
+              <div class="stall-line col-12 border-bottom h-100 rounded bg-secondary border border-2"></div>
+            </div>
+            <div class="right-column col-1 d-flex gap-1 justify-content-end">
+              <div class="box-wrapper col-10 d-flex flex-column gap-1">
+                @foreach ($rightColumnParticipant as $data)
+                <div @class( [ 'ratio ratio-1x1 border border-2 rounded d-flex justify-content-center
+                  align-items-center fw-bold text-white' , 'bg-danger'=> $data['isBooked'],
+                  'bg-success'=> !$data['isBooked']
+                  ])
+                  >
+                  {{$data['stall_number']}}
+                </div>
+                @endforeach
+              </div>
+              <div class="stall-line col-1 border-bottom bg-secondary"></div>
+            </div>
+          </div>
+          <div class="list-content-wrapper col-12 col-lg-4 p-2">
+            <div class="list-wrapper border border-2 p-1 rounded">
+              <p class="fw-bold fs-4 text-center">Daftar Pemancing</p>
+              <div class="list-wrap d-flex flex-column gap-1">
+                @foreach ($participants as $participant)
+                <div class="box-list col-12 border p-2 fw-bold rounded">{{$loop->iteration.".
+                  ".$participant['participant_name']}}</div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- Create Modal -->
-  <div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog ">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="myModalLabel">Tambah Pendaftar</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Create Modal -->
+<div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Tambah Pendaftar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{route('admin.store.participant.group')}}" class="form" id="addForm" method="POST">
+          @csrf
+          <input type="hidden" name="event_id" value="{{$event->id}}">
+          <div class="form-group mb-3">
+            <label for="name" class="mb-1">Nama</label>
+            <input value="" required class="form-control" type="text" name="name"
+              placeholder="Masukkan nama grup atau orang" />
+          </div>
+          <div class="form-group mb-3">
+            <label for="phone_num" class="mb-1">No Telepon (WA)</label>
+            <input value="" required class="form-control" type="text" name="phone_num"
+              placeholder="Masukkan no telepon WA" />
+          </div>
+          <div class="form-group mb-3">
+            <label for="total_member" class="mb-1">Jumlah Pemancing</label>
+            <input value="" required class="form-control" type="number" min="1" name="total_member"
+              placeholder="Masukkan jumlah pemancing" />
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Status</label>
+            <select data-cy="input-lecturer" class="form-select" aria-label="Default select example" name="status"
+              required>
+              <option value="">Pilih Status</option>
+              <option value={{App\Support\Enums\ParticipantGroupStatusEnum::UNPAID}}>Belum Bayar</option>
+              <option value={{App\Support\Enums\ParticipantGroupStatusEnum::DP}}>DP</option>
+              <option value={{App\Support\Enums\ParticipantGroupStatusEnum::PAID}}>Lunas</option>
+            </select>
+          </div>
+          <div class="form-group mb-3">
+            <label for="information" class="mb-1">Informasi (Opsional)</label>
+            <input value="" class="form-control" type="text" name="information"
+              placeholder="Masukkan informasi tambahan" />
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button data-cy="btn-submit-store" type="submit" class="btn btn-submit btn-success text-white">Simpan</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Edit Pendaftar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div id="spinner-edit" class="spinner-wrapper d-flex justify-content-center p-2">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
-        <div class="modal-body">
-          <form action="{{route('admin.store.participant.group')}}" class="form" id="addForm" method="POST">
+      </div>
+      <div class="not-found-state-edit">
+        <span class="text-danger">User not found</span>
+      </div>
+      <div class="content-wrapper-edit d-none" id="content-wrapper-edit">
+        <form action="" class="editForm" id="editForm" method="POST">
+          <div class="modal-body">
             @csrf
-            <input type="hidden" name="event_id" value="{{$event->id}}">
+            @method("PUT")
+            <input type="hidden" name="participant_group_id" id="participant-group-id" value="{{$event->id}}">
             <div class="form-group mb-3">
               <label for="name" class="mb-1">Nama</label>
-              <input value="" required class="form-control" type="text" name="name"
+              <input value="" required class="form-control" type="text" name="name" id="name_edit"
                 placeholder="Masukkan nama grup atau orang" />
             </div>
             <div class="form-group mb-3">
               <label for="phone_num" class="mb-1">No Telepon (WA)</label>
-              <input value="" required class="form-control" type="text" name="phone_num"
+              <input value="" required class="form-control" type="text" name="phone_num" id="phone_num_edit"
                 placeholder="Masukkan no telepon WA" />
             </div>
             <div class="form-group mb-3">
               <label for="total_member" class="mb-1">Jumlah Pemancing</label>
               <input value="" required class="form-control" type="number" min="1" name="total_member"
-                placeholder="Masukkan jumlah pemancing" />
+                id="total_member_edit" placeholder="Masukkan jumlah pemancing" />
             </div>
             <div class="form-group mb-3">
               <label class="form-label">Status</label>
-              <select data-cy="input-lecturer" class="form-select" aria-label="Default select example" name="status"
-                required>
+              <select data-cy="input-lecturer" id="status_edit" class="form-select" aria-label="Default select example"
+                name="status" required>
                 <option value="">Pilih Status</option>
-                <option value={{App\Support\Enums\ParticipantGroupStatusEnum::UNPAID}}>Belum Lunas</option>
+                <option value={{App\Support\Enums\ParticipantGroupStatusEnum::UNPAID}}>Belum Bayar</option>
                 <option value={{App\Support\Enums\ParticipantGroupStatusEnum::DP}}>DP</option>
                 <option value={{App\Support\Enums\ParticipantGroupStatusEnum::PAID}}>Lunas</option>
               </select>
@@ -369,175 +488,113 @@
               <input value="" class="form-control" type="text" name="information"
                 placeholder="Masukkan informasi tambahan" />
             </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button data-cy="btn-submit-store" type="submit" class="btn btn-submit btn-success text-white">Simpan</button>
-        </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Modal -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog ">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="myModalLabel">Edit Pendaftar</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div id="spinner-edit" class="spinner-wrapper d-flex justify-content-center p-2">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
           </div>
-        </div>
-        <div class="not-found-state-edit">
-          <span class="text-danger">User not found</span>
-        </div>
-        <div class="content-wrapper-edit d-none" id="content-wrapper-edit">
-          <form action="" class="editForm" id="editForm" method="POST">
-            <div class="modal-body">
-              @csrf
-              @method("PUT")
-              <input type="hidden" name="participant_group_id" id="participant-group-id" value="{{$event->id}}">
-              <div class="form-group mb-3">
-                <label for="name" class="mb-1">Nama</label>
-                <input value="" required class="form-control" type="text" name="name" id="name_edit"
-                  placeholder="Masukkan nama grup atau orang" />
-              </div>
-              <div class="form-group mb-3">
-                <label for="phone_num" class="mb-1">No Telepon (WA)</label>
-                <input value="" required class="form-control" type="text" name="phone_num" id="phone_num_edit"
-                  placeholder="Masukkan no telepon WA" />
-              </div>
-              <div class="form-group mb-3">
-                <label for="total_member" class="mb-1">Jumlah Pemancing</label>
-                <input value="" required class="form-control" type="number" min="1" name="total_member"
-                  id="total_member_edit" placeholder="Masukkan jumlah pemancing" />
-              </div>
-              <div class="form-group mb-3">
-                <label class="form-label">Status</label>
-                <select data-cy="input-lecturer" id="status_edit" class="form-select"
-                  aria-label="Default select example" name="status" required>
-                  <option value="">Pilih Status</option>
-                  <option value={{App\Support\Enums\ParticipantGroupStatusEnum::UNPAID}}>Belum Lunas</option>
-                  <option value={{App\Support\Enums\ParticipantGroupStatusEnum::DP}}>DP</option>
-                  <option value={{App\Support\Enums\ParticipantGroupStatusEnum::PAID}}>Lunas</option>
-                </select>
-              </div>
-              <div class="form-group mb-3">
-                <label for="information" class="mb-1">Informasi (Opsional)</label>
-                <input value="" class="form-control" type="text" name="information"
-                  placeholder="Masukkan informasi tambahan" />
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-              <button data-cy="btn-submit-update" type="submit"
-                class="btn btn-warning btn-submit text-black">Perbarui</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Draw Modal -->
-  <div class="modal fade" id="drawModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog ">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="myModalLabel">Pengundian Nomor Lapak</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div id="spinner-draw" class="spinner-wrapper d-flex justify-content-center p-2">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-        <div class="not-found-state-draw text-center p-2 d-none">
-          <span class="text-danger">Error</span>
-        </div>
-        <div class="content-wrapper-draw d-none" id="content-wrapper-draw">
-          <form action="{{route('admin.confirm.draw')}}" method="post" id="form-draw">
-            @csrf
-            <div class="modal-body text-center">
-              <input type="hidden" name="participantGroupID" id="participant-group-id-form-draw" value="">
-              <input type="hidden" name="randomStallNumberType" id="random-stall-number-type-form-draw" value="">
-              <input type="hidden" name="randomStallNumber" id="random-stall-number-form-draw" value="">
-              <input type="hidden" name="randomStallNumberUpper" id="random-stall-number-upper-form-draw" value="">
-              <input type="hidden" name="randomStallNumberUnder" id="random-stall-number-under-form-draw" value="">
-              <h2 class="random-stall-number purecounter" id="random-stall-number" data-purecounter-duration="0.3"
-                data-purecounter-start="0" data-purecounter-end="">
-              </h2>
-            </div>
-            <div class="modal-footer d-flex flex-column">
-              @if ($count>0)
-              <div class="btn btn-primary btn-redraw btn-draw-modal"
-                data-participant-group-id={{$groups_not_yet_drawn[$count-1]['id']}}>Undi Ulang
-              </div>
-              @endif
-              <div class="confirm-wrapper-multiple d-flex justify-content-center gap-3">
-                <button class="btn btn-success btn-under btn-confirm-draw btn-draw-modal" data-confirm-draw-type="0"
-                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">Bawah</button>
-                <button class="btn btn-success btn-upper btn-confirm-draw btn-draw-modal" data-confirm-draw-type="1"
-                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">Atas</button>
-              </div>
-              <div class="confirm-wrapper-single d-flex justify-content-center">
-                <button class="btn btn-success btn-confirm-draw btn-draw-modal">Konfirmasi</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Delete Modal -->
-  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog ">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="myModalLabel">Hapus Pendaftar</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <h4 class="text-center">Apakah anda yakin menghapus pendaftar <span class="registrant-name"
-              id="registrant-name"></span> ?
-          </h4>
-        </div>
-        <form action="" class="form" method="post" id="deleteForm">
-          @method('delete')
-          @csrf
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button data-cy="btn-delete-confirm" type="submit" id="deleteType"
-              class="btn btn-submit btn-danger">Hapus</button>
+            <button data-cy="btn-submit-update" type="submit"
+              class="btn btn-warning btn-submit text-black">Perbarui</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
-  @endsection
+</div>
 
-  @push('custom_css')
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">
-  @endpush
+<!-- Draw Modal -->
+<div class="modal fade" id="drawModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Pengundian Nomor Lapak</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div id="spinner-draw" class="spinner-wrapper d-flex justify-content-center p-2">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div class="not-found-state-draw text-center p-2 d-none">
+        <span class="text-danger">Error</span>
+      </div>
+      <div class="content-wrapper-draw d-none" id="content-wrapper-draw">
+        <form action="{{route('admin.confirm.draw')}}" method="post" id="form-draw">
+          @csrf
+          <div class="modal-body text-center">
+            <input type="hidden" name="participantGroupID" id="participant-group-id-form-draw" value="">
+            <input type="hidden" name="randomStallNumberType" id="random-stall-number-type-form-draw" value="">
+            <input type="hidden" name="randomStallNumber" id="random-stall-number-form-draw" value="">
+            <input type="hidden" name="randomStallNumberUpper" id="random-stall-number-upper-form-draw" value="">
+            <input type="hidden" name="randomStallNumberUnder" id="random-stall-number-under-form-draw" value="">
+            <h2 class="random-stall-number purecounter" id="random-stall-number" data-purecounter-duration="0.3"
+              data-purecounter-start="0" data-purecounter-end="">
+            </h2>
+          </div>
+          <div class="modal-footer d-flex flex-column">
+            @if ($count>0)
+            <div class="btn btn-primary btn-redraw btn-draw-modal"
+              data-participant-group-id={{$groups_not_yet_drawn[$count-1]['id']}}>Undi Ulang
+            </div>
+            @endif
+            <div class="confirm-wrapper-multiple d-flex justify-content-center gap-3">
+              <button class="btn btn-success btn-under btn-confirm-draw btn-draw-modal" data-confirm-draw-type="0"
+                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">Bawah</button>
+              <button class="btn btn-success btn-upper btn-confirm-draw btn-draw-modal" data-confirm-draw-type="1"
+                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">Atas</button>
+            </div>
+            <div class="confirm-wrapper-single d-flex justify-content-center">
+              <button class="btn btn-success btn-confirm-draw btn-draw-modal">Konfirmasi</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
-  @push('js')
-  <script src="{{asset('vendor/purecounterjs-main/dist/purecounter_vanilla.js')}}"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
-  <script>
-    $('.search-input').keyup(function() {
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Hapus Pendaftar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h4 class="text-center">Apakah anda yakin menghapus pendaftar <span class="registrant-name"
+            id="registrant-name"></span> ?
+        </h4>
+      </div>
+      <form action="" class="form" method="post" id="deleteForm">
+        @method('delete')
+        @csrf
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button data-cy="btn-delete-confirm" type="submit" id="deleteType"
+            class="btn btn-submit btn-danger">Hapus</button>
+      </form>
+    </div>
+  </div>
+</div>
+@endsection
+
+@push('custom_css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css">
+@endpush
+
+@push('js')
+<script src="{{asset('vendor/purecounterjs-main/dist/purecounter_vanilla.js')}}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
+<script>
+  $('.search-input').keyup(function() {
         let table = $('#participant-group-table').DataTable();
         table.search($(this).val()).draw();
     });
@@ -787,5 +844,5 @@
 
   $('#deleteForm').attr('action', deleteLink);
   });
-  </script>
-  @endpush
+</script>
+@endpush

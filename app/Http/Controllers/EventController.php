@@ -34,7 +34,32 @@ class EventController extends Controller
 
         $groups_drawn = $groupCollect->where("raffle_status", "completed")->sortBy(["created_at", "asc"])->values();
 
-        return view('admin_views.detail_event', ['event' => $event, 'groups_not_yet_drawn' => $groups_not_yet_drawn, 'groups_drawn' => $groups_drawn]);
+        $eventParticipants = Participant::where('event_id', $event->id)->orderBy('stall_number', 'asc')->get();
+
+        $participantsData = collect();
+
+        for ($i = 0; $i < Constants::MAX_STALLS; $i++) {
+            $stallNumber = $i + 1;
+            $participantName = $eventParticipants->where('stall_number', $stallNumber)->first()?->name;
+            $participantsData->push([
+                "stall_number" => $stallNumber,
+                "participant_name" => isset($participantName) ? $participantName : "-",
+                "isBooked" => isset($participantName) ? true : false
+            ]);
+        }
+
+        $allParticipantsData = $participantsData;
+
+        $splitParticipantsData = $participantsData->split(2);
+
+        return view('admin_views.detail_event', [
+            'event' => $event,
+            'groups_not_yet_drawn' => $groups_not_yet_drawn,
+            'groups_drawn' => $groups_drawn,
+            'participants' => $allParticipantsData,
+            'leftColumnParticipant' => $splitParticipantsData->first(),
+            'rightColumnParticipant' => $splitParticipantsData->last(),
+        ]);
     }
 
     public function storeParticipantGroup(Request $request)
@@ -189,17 +214,36 @@ class EventController extends Controller
 
             $bookedStalls = Participant::where('event_id', $participantGroup->event_id)->get()->pluck('stall_number');
 
-            $numbers = collect(range(1, 222));
+            $numbers = collect(range(1, Constants::MAX_STALLS));
 
             $availableStallNumber = $numbers->whereNotIn(null, $bookedStalls->toArray())->values();
 
             $rawRange = $participantGroup->total_member > 1 ? $availableStallNumber->chunk(($participantGroup->total_member * 2) - 1) : $availableStallNumber;
 
-            $randomStallNumber = $participantGroup->total_member > 1 ? $rawRange->random()->values() : $rawRange->random();
+            $randomStallNumber = $participantGroup->total_member > 1 ?
+                $rawRange->filter(function ($data) use ($participantGroup) {
+                    return $data->count() >= $participantGroup->total_member;
+                })->random()->values()
+                : $rawRange->random();
+
 
             $under = $participantGroup->total_member > 1 ? $randomStallNumber->slice(0, ceil($randomStallNumber->count() / 2))->values() : null;
             $upper = $participantGroup->total_member > 1 ? $randomStallNumber->slice(ceil($randomStallNumber->count() / 2) - 1)->values() : null;
             $middle = $participantGroup->total_member > 1 ? $under->last() : $randomStallNumber;
+
+
+            if ($participantGroup->total_member > 1) {
+                if ($upper->count() < $participantGroup->total_member || $under->count() < $participantGroup->total_member) {
+                    $randomStallNumberChunk = $randomStallNumber->chunk($participantGroup->total_member);
+                    $randomStallNumberChunkFilter = $randomStallNumberChunk->filter(function ($data) use ($participantGroup) {
+                        return count($data) >= $participantGroup->total_member;
+                    })->first();
+
+                    $under = $randomStallNumberChunkFilter;
+                    $upper = $randomStallNumberChunkFilter;
+                    $middle = $randomStallNumberChunkFilter->split(2)->first()->last();
+                }
+            }
 
             return response()->json([
                 'data' => [
@@ -208,10 +252,11 @@ class EventController extends Controller
                     'randomStallNumber' => $randomStallNumber,
                     'upper' => $upper,
                     'under' => $under,
-                    'middle' => $middle
+                    'middle' => $middle,
                 ],
             ]);
         } catch (\Throwable $th) {
+            dd($th->getMessage());
             return response()->json([
                 'message' => 'Error'
             ], 404);
